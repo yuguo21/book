@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.logic.mapper.LogicBookContentMapper">
+    
+    <resultMap type="LogicBookContent" id="LogicBookContentResult">
+        <result property="contentId"    column="content_id"    />
+        <result property="content"    column="content"    />
+        <result property="bookKey"    column="book_key"    />
+        <result property="titleId"    column="title_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectLogicBookContentVo">
+        select content_id, content, book_key, title_id, create_by, create_time, update_by, update_time, remark from logic_book_content
+    </sql>
+
+    <select id="selectLogicBookContentList" parameterType="LogicBookContent" resultMap="LogicBookContentResult">
+        <include refid="selectLogicBookContentVo"/>
+        <where>  
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+        </where>
+    </select>
+    
+    <select id="selectLogicBookContentByContentId" parameterType="Long" resultMap="LogicBookContentResult">
+        <include refid="selectLogicBookContentVo"/>
+        where content_id = #{contentId}
+    </select>
+        
+    <insert id="insertLogicBookContent" parameterType="LogicBookContent">
+        insert into logic_book_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contentId != null">content_id,</if>
+            <if test="content != null">content,</if>
+            <if test="bookKey != null">book_key,</if>
+            <if test="titleId != null">title_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="contentId != null">#{contentId},</if>
+            <if test="content != null">#{content},</if>
+            <if test="bookKey != null">#{bookKey},</if>
+            <if test="titleId != null">#{titleId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLogicBookContent" parameterType="LogicBookContent">
+        update logic_book_content
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="content != null">content = #{content},</if>
+            <if test="bookKey != null">book_key = #{bookKey},</if>
+            <if test="titleId != null">title_id = #{titleId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where content_id = #{contentId}
+    </update>
+
+    <delete id="deleteLogicBookContentByContentId" parameterType="Long">
+        delete from logic_book_content where content_id = #{contentId}
+    </delete>
+
+    <delete id="deleteLogicBookContentByContentIds" parameterType="String">
+        delete from logic_book_content where content_id in 
+        <foreach item="contentId" collection="array" open="(" separator="," close=")">
+            #{contentId}
+        </foreach>
+    </delete>
+
+</mapper>

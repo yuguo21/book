@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('书的内容列表')" />
+    <th:block th:include="include :: summernote-css" />
+</head>
+<body>
+     <div class="page-container" style="height: auto !important;">
+        <div class="row show-grid">
+            <div class="col-md-2" style="border-right-width: 1px;">list</div>
+            <div class="col-md-10" style="border-left-width: 1px;">content</div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+
+    </script>
+</body>
+</html>

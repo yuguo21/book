@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.logic.mapper.LogicPersonRelationMapper">
+    
+    <resultMap type="LogicPersonRelation" id="LogicPersonRelationResult">
+        <result property="relationId"    column="relation_id"    />
+        <result property="bookKey"    column="book_key"    />
+        <result property="personIdA"    column="person_id_a"    />
+        <result property="personIdB"    column="person_id_b"    />
+        <result property="relationName"    column="relation_name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="nameA" column="name_a"/>
+        <result property="nameB" column="name_b"/>
+    </resultMap>
+
+    <sql id = "selectPersonName">
+        ,(select name from logic_meta where meta_id = person_id_b) as name_b,
+        (select name from logic_meta where meta_id = person_id_a) as name_a
+    </sql>
+
+    <sql id="selectLogicPersonRelationVo">
+        select relation_id, book_key, person_id_a, person_id_b, relation_name, create_by, create_time, update_by, update_time, remark
+        <include refid="selectPersonName"></include>
+        from logic_person_relation
+    </sql>
+
+    <select id="selectLogicPersonRelationList" parameterType="LogicPersonRelationDTO" resultMap="LogicPersonRelationResult">
+        <include refid="selectLogicPersonRelationVo"/>
+        <where>
+            <if test="bookKey != null  and bookKey != ''"> and book_key = #{bookKey}</if>
+            <if test="personIdA != null "> and person_id_a = #{personIdA}</if>
+            <if test="personIdB != null "> and person_id_b = #{personIdB}</if>
+            <if test="relationName != null  and relationName != ''"> and relation_name = #{relationName}</if>
+            <if test="personIds != null and personIds.length>0">and person_id_a in
+                <foreach collection="personIds" item="personId" index="index" open="(" close=")" separator=",">
+                    #{personId}
+                </foreach>
+            </if>
+            <!-- <if test="personIds != null and personIds !=''">and person_id_a in (${personIds})</if> -->
+        </where>
+    </select>
+    
+    <select id="selectLogicPersonRelationByRelationId" parameterType="Long" resultMap="LogicPersonRelationResult">
+        <include refid="selectLogicPersonRelationVo"/>
+        where relation_id = #{relationId}
+    </select>
+        
+    <insert id="insertLogicPersonRelation" parameterType="LogicPersonRelation">
+        insert into logic_person_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="relationId != null">relation_id,</if>
+            <if test="bookKey != null and bookKey != ''">book_key,</if>
+            <if test="personIdA != null">person_id_a,</if>
+            <if test="personIdB != null">person_id_b,</if>
+            <if test="relationName != null and relationName != ''">relation_name,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="relationId != null">#{relationId},</if>
+            <if test="bookKey != null and bookKey != ''">#{bookKey},</if>
+            <if test="personIdA != null">#{personIdA},</if>
+            <if test="personIdB != null">#{personIdB},</if>
+            <if test="relationName != null and relationName != ''">#{relationName},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLogicPersonRelation" parameterType="LogicPersonRelation">
+        update logic_person_relation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bookKey != null and bookKey != ''">book_key = #{bookKey},</if>
+            <if test="personIdA != null">person_id_a = #{personIdA},</if>
+            <if test="personIdB != null">person_id_b = #{personIdB},</if>
+            <if test="relationName != null and relationName != ''">relation_name = #{relationName},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where relation_id = #{relationId}
+    </update>
+
+    <delete id="deleteLogicPersonRelationByRelationId" parameterType="Long">
+        delete from logic_person_relation where relation_id = #{relationId}
+    </delete>
+
+    <delete id="deleteLogicPersonRelationByRelationIds" parameterType="String">
+        delete from logic_person_relation where relation_id in 
+        <foreach item="relationId" collection="array" open="(" separator="," close=")">
+            #{relationId}
+        </foreach>
+    </delete>
+
+</mapper>

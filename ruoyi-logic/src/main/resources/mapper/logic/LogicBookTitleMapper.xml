@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.logic.mapper.LogicBookTitleMapper">
+    
+    <resultMap type="LogicBookTitle" id="LogicBookTitleResult">
+        <result property="titleId"    column="title_id"    />
+        <result property="title"    column="title"    />
+        <result property="bookKey"    column="book_key"    />
+        <result property="flag"    column="flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectLogicBookTitleVo">
+        select title_id, title, book_key, flag, create_time, create_by, update_time, update_by, remark from logic_book_title
+    </sql>
+
+    <select id="selectLogicBookTitleList" parameterType="LogicBookTitle" resultMap="LogicBookTitleResult">
+        <include refid="selectLogicBookTitleVo"/>
+        <where>
+            <if test="bookKey != null">
+                book_key = #{bookKey}
+            </if>
+            <if test="flag != null">
+               flag = #{flag}
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectLogicBookTitleByTitleId" parameterType="Long" resultMap="LogicBookTitleResult">
+        <include refid="selectLogicBookTitleVo"/>
+        where title_id = #{titleId}
+    </select>
+        
+    <insert id="insertLogicBookTitle" parameterType="LogicBookTitle" useGeneratedKeys="true" keyProperty="titleId">
+        insert into logic_book_title
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">title,</if>
+            <if test="bookKey != null">book_key,</if>
+            <if test="flag != null">flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">#{title},</if>
+            <if test="bookKey != null">#{bookKey},</if>
+            <if test="flag != null">#{flag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLogicBookTitle" parameterType="LogicBookTitle">
+        update logic_book_title
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null">title = #{title},</if>
+            <if test="bookKey != null">book_key = #{bookKey},</if>
+            <if test="flag != null">flag = #{flag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where title_id = #{titleId}
+    </update>
+
+    <delete id="deleteLogicBookTitleByTitleId" parameterType="Long">
+        delete from logic_book_title where title_id = #{titleId}
+    </delete>
+
+    <delete id="deleteLogicBookTitleByTitleIds" parameterType="String">
+        delete from logic_book_title where title_id in 
+        <foreach item="titleId" collection="array" open="(" separator="," close=")">
+            #{titleId}
+        </foreach>
+    </delete>
+
+</mapper>
