@@ -1,9 +1,11 @@
 package com.ruoyi.logic.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.DictUtils;
+import com.ruoyi.logic.domain.LogicBookTitleTreeVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,9 +41,8 @@ public class LogicBookTitleController extends BaseController
 
     @RequiresPermissions("logic:title:view")
     @GetMapping()
-    public String title(String bookey, ModelMap mmap) {
-        List<LogicBookTitle> bookChapters = logicBookTitleService.findByBookey(bookey);
-        mmap.addAttribute("bookChapters", bookChapters);
+    public String title(String bookKey, ModelMap mmap) {
+        mmap.addAttribute("bookKey", bookKey);
         return prefix + "/title";
     }
 
@@ -89,8 +90,9 @@ public class LogicBookTitleController extends BaseController
      * 新增书的内容
      */
     @GetMapping("/add")
-    public String add()
+    public String add(String bookKey, ModelMap mmap)
     {
+        mmap.addAttribute("bookKey", bookKey);
         return prefix + "/add";
     }
 
@@ -104,6 +106,28 @@ public class LogicBookTitleController extends BaseController
     public AjaxResult addSave(LogicBookTitle logicBookTitle)
     {
         return toAjax(logicBookTitleService.insertLogicBookTitle(logicBookTitle));
+    }
+
+    @GetMapping("/tree")
+    @ResponseBody
+    public List<LogicBookTitleTreeVo> tree(String bookKey){
+        List<LogicBookTitle> chapters = logicBookTitleService.findByBookey(bookKey);
+        List<LogicBookTitleTreeVo> treeVos = new ArrayList<>(chapters.size()+1);
+        LogicBookTitleTreeVo treeRoot = new LogicBookTitleTreeVo();
+        treeRoot.setId(999999L);
+        treeRoot.setpId(0L);
+        treeRoot.setName("章节");
+        treeRoot.setTitle("章节");
+        treeVos.add(treeRoot);
+        for (LogicBookTitle charpter : chapters){
+            LogicBookTitleTreeVo tmpChapter = new LogicBookTitleTreeVo();
+            tmpChapter.setId(charpter.getTitleId());
+            tmpChapter.setpId(999999L);
+            tmpChapter.setName(charpter.getTitle());
+            tmpChapter.setTitle(charpter.getTitle());
+            treeVos.add(tmpChapter);
+        }
+        return treeVos;
     }
 
     /**

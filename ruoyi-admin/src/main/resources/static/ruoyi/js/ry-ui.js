@@ -3,6 +3,39 @@
  * Copyright (c) 2019 ruoyi
  */
 
+function initTextAreaTab(textarea, spaceCount = 8){
+    var func = function(e){
+        if(event.code !== "Tab") return true;
+
+        event.preventDefault();
+
+        let start = this.selectionStart;
+        let end = this.selectionEnd;
+        var indent = '';
+        for(var i = 0; i < spaceCount; i++){indent += ' ';}
+
+        if(start === end){
+            document.execCommand('insertText',false,indent);
+        }
+        else {
+            let strBefore = this.value.slice(0, start);
+            let curLineStart = strBefore.includes('\n') ? strBefore.lastIndexOf('\n') + 1 : 0;
+            let strBetween = this.value.slice(curLineStart, end + 1);
+            let newStr = "  " + strBetween.replace(/\n/g, '\n  ');
+            let lineBreakCount = strBetween.split('\n').length;
+            let newStart = start + 2;
+            let newEnd = end + (lineBreakCount + 1) * 2;
+
+            this.setSelectionRange(curLineStart, end);
+            document.execCommand("insertText", false, newStr);
+            this.setSelectionRange(newStart, newEnd);
+        }
+    };
+
+    $(textarea).off(func);
+    $(textarea).on('keydown', func);
+}
+
 // 当前table相关信息
 var table = {
     config: {},
