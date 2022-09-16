@@ -20,6 +20,13 @@ public interface ILogicBookContentService
     public LogicBookContent selectLogicBookContentByContentId(Long contentId);
 
     /**
+     * get content by chapter id
+     * @param titleId
+     * @return
+     */
+    public LogicBookContent getLogicBookContentByTitleId(Long titleId);
+
+    /**
      * 查询书内容列表
      * 
      * @param logicBookContent 书内容

@@ -2,6 +2,7 @@ package com.ruoyi.logic.mapper;
 
 import java.util.List;
 import com.ruoyi.logic.domain.LogicBookContent;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 书内容Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.logic.domain.LogicBookContent;
  * @author ruoyi
  * @date 2022-03-01
  */
+@Mapper
 public interface LogicBookContentMapper 
 {
     /**
@@ -18,6 +20,13 @@ public interface LogicBookContentMapper
      * @return 书内容
      */
     public LogicBookContent selectLogicBookContentByContentId(Long contentId);
+
+    /**
+     * 获取内容
+     * @param logicBookContent
+     * @return
+     */
+    public LogicBookContent selectLogicBookContent(LogicBookContent logicBookContent);
 
     /**
      * 查询书内容列表

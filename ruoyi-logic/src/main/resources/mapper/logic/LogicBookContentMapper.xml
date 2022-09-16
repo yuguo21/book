@@ -24,9 +24,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectLogicBookContentVo"/>
         <where>  
             <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="titleId != null  and titleId != ''"> and title_id = #{titleId}</if>
+            <if test="bookKey != null  and bookKey != ''"> and book_key = #{bookKey}</if>
         </where>
     </select>
-    
+
+    <select id="selectLogicBookContent" parameterType="LogicBookContent" resultMap="LogicBookContentResult">
+        <include refid="selectLogicBookContentVo"/>
+        <where>
+            <if test="contentId != null  and contentId != ''"> and contentId = #{contentId}</if>
+            <if test="titleId != null  and titleId != ''"> and title_id = #{titleId}</if>
+        </where>
+    </select>
+
     <select id="selectLogicBookContentByContentId" parameterType="Long" resultMap="LogicBookContentResult">
         <include refid="selectLogicBookContentVo"/>
         where content_id = #{contentId}

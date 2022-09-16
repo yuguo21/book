@@ -2,12 +2,15 @@ package com.ruoyi.logic.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.logic.service.ILogicBookContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.logic.mapper.LogicBookTitleMapper;
 import com.ruoyi.logic.domain.LogicBookTitle;
 import com.ruoyi.logic.service.ILogicBookTitleService;
 import com.ruoyi.common.core.text.Convert;
+
+import javax.annotation.Resource;
 
 /**
  * 书的内容Service业务层处理
@@ -18,8 +21,11 @@ import com.ruoyi.common.core.text.Convert;
 @Service
 public class LogicBookTitleServiceImpl implements ILogicBookTitleService 
 {
-    @Autowired
+    @Resource
     private LogicBookTitleMapper logicBookTitleMapper;
+
+    @Resource
+    private ILogicBookContentService contentService;
 
     /**
      * 查询书的内容

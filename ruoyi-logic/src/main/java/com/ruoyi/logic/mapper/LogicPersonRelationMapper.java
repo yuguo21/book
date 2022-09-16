@@ -3,6 +3,7 @@ package com.ruoyi.logic.mapper;
 import java.util.List;
 import com.ruoyi.logic.domain.LogicPersonRelation;
 import com.ruoyi.logic.dto.LogicPersonRelationDTO;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 人物关系Mapper接口
@@ -10,6 +11,7 @@ import com.ruoyi.logic.dto.LogicPersonRelationDTO;
  * @author ruoyi
  * @date 2022-02-18
  */
+@Mapper
 public interface LogicPersonRelationMapper 
 {
     /**

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
-    <th:block th:include="include :: header('写书')" />
+    <th:block th:include="include :: header('章节')" />
     <th:block th:include="include :: layout-latest-css" />
     <th:block th:include="include :: ztree-css" />
 </head>
@@ -10,13 +10,12 @@
         <div class="box box-main">
             <div class="box-header">
                 <div class="box-title">
-                    <i class="fa icon-grid"></i> 组织机构
+                    <i class="fa icon-grid"></i> 章节
                 </div>
                 <div class="box-tools pull-right">
-                    <a type="button" class="btn btn-box-tool" href="#" onclick="dept()" title="管理部门"><i class="fa fa-edit"></i></a>
-                    <button type="button" class="btn btn-box-tool" id="btnExpand" title="展开" style="display:none;"><i class="fa fa-chevron-up"></i></button>
+                    <a type="button" class="btn btn-box-tool" href="#" onclick="openEditTitle();" title="章节"><i class="fa fa-edit"></i></a>
                     <button type="button" class="btn btn-box-tool" id="btnCollapse" title="折叠"><i class="fa fa-chevron-down"></i></button>
-                    <button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新部门"><i class="fa fa-refresh"></i></button>
+                    <button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新章节"><i class="fa fa-refresh"></i></button>
                 </div>
             </div>
             <div class="ui-layout-content">
@@ -30,14 +29,14 @@
                 <ul>
                     <li>
                         <a class="btn btn-primary btn-rounded btn-sm" onclick="void(0);"><i class="fa fa-search"></i>&nbsp;编辑</a>
-                        <a class="btn btn-warning btn-rounded btn-sm" onclick="void(0);"><i class="fa fa-refresh"></i>&nbsp;保存</a>
+                        <a class="btn btn-warning btn-rounded btn-sm" onclick="saveContent();"><i class="fa fa-refresh"></i>&nbsp;保存</a>
                     </li>
                 </ul>
             </div>
-            <form class="formH100">
+            <form class="formH100" id="bookForm">
                 <input type="hidden" id="bookKey" name="bookKey" th:value="${bookKey}" />
                 <input type="hidden" id="titleId" name="titleId"/>
-                <textarea class="paperlines" id="content" name="content" placeholder="......" ></textarea>
+                <textarea style="font-family: 楷体;" class="paperlines" id="content" name="content" placeholder="  最是人间留不住,朱颜辞镜花辞树" ></textarea>
             </form>
         </div>
     </div>
@@ -67,9 +66,10 @@
                 $('#scroll-up').toTop(opt);
             }
             queryTree();
-            initTextAreaTab(document.getElementById('content'), spaceCount = 4)
+            initTextAreaTab(document.getElementById('content'), 4);
         });
 
+        //chapter tree
         function queryTree() {
             var url = prefix + "/tree?bookKey=" + bookKey;
             var options = {
@@ -80,15 +80,62 @@
             $.tree.init(options);
 
             function zOnClick(event, treeId, treeNode) {
-                $("#deptId").val(treeNode.id);
-                $("#parentId").val(treeNode.pId);
-                $.table.search();
+                let nodeId = treeNode.id;
+                if (nodeId != '99999999'){
+                    $("#titleId").val(nodeId);
+
+                }
+                getContentByTitileId(nodeId)
             }
         }
-        function add(){
-            $.modal.open("添加章节", "/logic/title/add?bookKey="+bookKey);
+
+        function getContentByTitileId(id){
+            //点击章节获取对应的内容
+            $.ajax({
+                url: prefix + "/getContent",
+                method: "get",
+                data: {titleId: id},
+                success: function(data){
+                    if (data.code == 0){
+                        try{
+                            if (data.data.content){
+                                $("#content").val(data.data.content);
+                            }else{
+                                $("#content").val("暂无内容");
+                            }
+                        }catch (e) {
+                            $("#content").val("暂无内容");
+                        }
+                    }
+                }
+            });
         }
 
+        function saveContent(){
+            let bookContent = $("#bookForm").serialize();
+            $.ajax({
+                url: prefix + "/addContent",
+                method: "post",
+                data: bookContent,
+                success: function(data){
+                    if(data.code == 0){
+                        $.modal.msgSuccess(data.msg);
+                    }
+                }
+            });
+        }
+        //打开编辑标题对话框
+        function openEditTitle(){
+            $.modal.open("修改", prefix + "/edit/"+$("#titleId").val(), 800, 200, editTitleCallBack);
+        }
+
+        function editTitleCallBack(index){
+            document.getElementById("layui-layer-iframe"+index).contentWindow.submitHandler();
+            setTimeout(function (){
+                queryTree();
+            }, 800);
+            $.modal.closeAll();
+        }
     </script>
 </body>
 </html>

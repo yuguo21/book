@@ -2,6 +2,7 @@ package com.ruoyi.logic.mapper;
 
 import java.util.List;
 import com.ruoyi.logic.domain.LogicBookTitle;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 书的内容Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.logic.domain.LogicBookTitle;
  * @author ruoyi
  * @date 2022-02-26
  */
+@Mapper
 public interface LogicBookTitleMapper
 {
     /**

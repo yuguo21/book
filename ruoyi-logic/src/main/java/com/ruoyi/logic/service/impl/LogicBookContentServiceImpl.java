@@ -9,6 +9,8 @@ import com.ruoyi.logic.domain.LogicBookContent;
 import com.ruoyi.logic.service.ILogicBookContentService;
 import com.ruoyi.common.core.text.Convert;
 
+import javax.annotation.Resource;
+
 /**
  * 书内容Service业务层处理
  * 
@@ -18,7 +20,7 @@ import com.ruoyi.common.core.text.Convert;
 @Service
 public class LogicBookContentServiceImpl implements ILogicBookContentService 
 {
-    @Autowired
+    @Resource
     private LogicBookContentMapper logicBookContentMapper;
 
     /**
@@ -31,6 +33,13 @@ public class LogicBookContentServiceImpl implements ILogicBookContentService
     public LogicBookContent selectLogicBookContentByContentId(Long contentId)
     {
         return logicBookContentMapper.selectLogicBookContentByContentId(contentId);
+    }
+
+    @Override
+    public LogicBookContent getLogicBookContentByTitleId(Long titleId) {
+        LogicBookContent logicBookContent = new LogicBookContent();
+        logicBookContent.setTitleId(titleId);
+        return logicBookContentMapper.selectLogicBookContent(logicBookContent);
     }
 
     /**

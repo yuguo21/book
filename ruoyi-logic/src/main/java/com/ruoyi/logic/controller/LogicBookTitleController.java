@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.common.utils.DictUtils;
+import com.ruoyi.logic.domain.LogicBookContent;
 import com.ruoyi.logic.domain.LogicBookTitleTreeVo;
+import com.ruoyi.logic.service.ILogicBookContentService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,6 +40,8 @@ public class LogicBookTitleController extends BaseController
 
     @Autowired
     private ILogicBookTitleService logicBookTitleService;
+    @Autowired
+    private ILogicBookContentService logicBookContentService;
 
     @RequiresPermissions("logic:title:view")
     @GetMapping()
@@ -108,13 +112,18 @@ public class LogicBookTitleController extends BaseController
         return toAjax(logicBookTitleService.insertLogicBookTitle(logicBookTitle));
     }
 
+    /**
+     * get chapter tree
+     * @param bookKey
+     * @return
+     */
     @GetMapping("/tree")
     @ResponseBody
     public List<LogicBookTitleTreeVo> tree(String bookKey){
         List<LogicBookTitle> chapters = logicBookTitleService.findByBookey(bookKey);
         List<LogicBookTitleTreeVo> treeVos = new ArrayList<>(chapters.size()+1);
         LogicBookTitleTreeVo treeRoot = new LogicBookTitleTreeVo();
-        treeRoot.setId(999999L);
+        treeRoot.setId(99999999L);
         treeRoot.setpId(0L);
         treeRoot.setName("章节");
         treeRoot.setTitle("章节");
@@ -122,12 +131,38 @@ public class LogicBookTitleController extends BaseController
         for (LogicBookTitle charpter : chapters){
             LogicBookTitleTreeVo tmpChapter = new LogicBookTitleTreeVo();
             tmpChapter.setId(charpter.getTitleId());
-            tmpChapter.setpId(999999L);
+            tmpChapter.setpId(99999999L);
             tmpChapter.setName(charpter.getTitle());
             tmpChapter.setTitle(charpter.getTitle());
             treeVos.add(tmpChapter);
         }
         return treeVos;
+    }
+
+    @GetMapping("getContent")
+    @ResponseBody
+    public AjaxResult getContent(Long titleId){
+        LogicBookContent content = logicBookContentService.getLogicBookContentByTitleId(titleId);
+        return AjaxResult.success(content);
+    }
+
+    /**
+     * 新增保存书内容
+     */
+    @RequiresPermissions("logic:content:add")
+    @Log(title = "书内容", businessType = BusinessType.INSERT)
+    @PostMapping("/addContent")
+    @ResponseBody
+    public AjaxResult addContent(LogicBookContent logicBookContent)
+    {
+        Long titleId = logicBookContent.getTitleId();
+        LogicBookContent bookContent = logicBookContentService.getLogicBookContentByTitleId(titleId);
+        if (bookContent == null){
+            return toAjax(logicBookContentService.insertLogicBookContent(logicBookContent));
+        }else{
+            bookContent.setContent(logicBookContent.getContent());
+            return toAjax(logicBookContentService.updateLogicBookContent(bookContent));
+        }
     }
 
     /**

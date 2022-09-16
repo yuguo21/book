@@ -130,4 +130,5 @@ public class LogicBookContentController extends BaseController
     {
         return toAjax(logicBookContentService.deleteLogicBookContentByContentIds(ids));
     }
+
 }

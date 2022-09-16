@@ -9,6 +9,8 @@ import com.ruoyi.logic.domain.LogicMeta;
 import com.ruoyi.logic.service.ILogicMetaService;
 import com.ruoyi.common.core.text.Convert;
 
+import javax.annotation.Resource;
+
 /**
  * 书中元素Service业务层处理
  * 
@@ -18,7 +20,7 @@ import com.ruoyi.common.core.text.Convert;
 @Service
 public class LogicMetaServiceImpl implements ILogicMetaService 
 {
-    @Autowired
+    @Resource
     private LogicMetaMapper logicMetaMapper;
 
     /**

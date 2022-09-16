@@ -2,6 +2,7 @@ package com.ruoyi.logic.mapper;
 
 import java.util.List;
 import com.ruoyi.logic.domain.LogicMeta;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 书中元素Mapper接口
@@ -9,6 +10,7 @@ import com.ruoyi.logic.domain.LogicMeta;
  * @author ruoyi
  * @date 2022-02-22
  */
+@Mapper
 public interface LogicMetaMapper 
 {
     /**
