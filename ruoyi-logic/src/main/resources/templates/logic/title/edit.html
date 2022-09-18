@@ -43,7 +43,7 @@
             focusCleanup: true
         });
 
-        function submitHandler() {
+        window.submitHandler = function submitHandler() {
             if ($.validate.form()) {
                 $.operate.save(prefix + "/edit", $('#form-title-edit').serialize());
             }

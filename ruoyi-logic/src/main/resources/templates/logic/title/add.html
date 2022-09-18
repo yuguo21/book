@@ -40,11 +40,13 @@
         });
 
         function submitHandler() {
+            let ret = false;
             if ($.validate.form()) {
                 $.ajax({
                     url: prefix + "/add",
                     method: "POST",
                     dataType: "json",
+                    async: false,
                     data: $('#form-title-add').serialize(),
                     beforeSend: function () {
                         $.modal.loading("正在处理中，请稍候...");
@@ -52,13 +54,14 @@
                     },
                     success: function(result) {
                         if (result.code == 0){
-                            window.parent.location.reload();
+                            ret = true;
                         }else{
-
+                            ret = false;
                         }
                     }
                 });
             }
+            return ret;
         }
     </script>
 </body>

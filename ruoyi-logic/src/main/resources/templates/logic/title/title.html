@@ -14,7 +14,7 @@
                 </div>
                 <div class="box-tools pull-right">
                     <a type="button" class="btn btn-box-tool" href="#" onclick="openEditTitle();" title="章节"><i class="fa fa-edit"></i></a>
-                    <button type="button" class="btn btn-box-tool" id="btnCollapse" title="折叠"><i class="fa fa-chevron-down"></i></button>
+                    <button type="button" class="btn btn-box-tool" id="btnAddTitle" title="添加章节"><i class="fa fa-plus"></i></button>
                     <button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新章节"><i class="fa fa-refresh"></i></button>
                 </div>
             </div>
@@ -28,7 +28,7 @@
             <div class="select-list">
                 <ul>
                     <li>
-                        <a class="btn btn-primary btn-rounded btn-sm" onclick="void(0);"><i class="fa fa-search"></i>&nbsp;编辑</a>
+                        <a class="btn btn-primary btn-rounded btn-sm" onclick="editContent();"><i class="fa fa-search"></i>&nbsp;编辑</a>
                         <a class="btn btn-warning btn-rounded btn-sm" onclick="saveContent();"><i class="fa fa-refresh"></i>&nbsp;保存</a>
                     </li>
                 </ul>
@@ -36,7 +36,7 @@
             <form class="formH100" id="bookForm">
                 <input type="hidden" id="bookKey" name="bookKey" th:value="${bookKey}" />
                 <input type="hidden" id="titleId" name="titleId"/>
-                <textarea style="font-family: 楷体;" class="paperlines" id="content" name="content" placeholder="  最是人间留不住,朱颜辞镜花辞树" ></textarea>
+                <textarea readonly="true" style="font-family: 楷体;" class="paperlines" id="content" name="content" placeholder="  最是人间留不住,朱颜辞镜花辞树" ></textarea>
             </form>
         </div>
     </div>
@@ -67,6 +67,8 @@
             }
             queryTree();
             initTextAreaTab(document.getElementById('content'), 4);
+            document.querySelector("#btnRefresh").onclick = queryTree;
+            document.querySelector("#btnAddTitle").onclick = openAddTitle;
         });
 
         //chapter tree
@@ -83,9 +85,10 @@
                 let nodeId = treeNode.id;
                 if (nodeId != '99999999'){
                     $("#titleId").val(nodeId);
-
+                    getContentByTitileId(nodeId);
+                }else{
+                    $("#titleId").val('');
                 }
-                getContentByTitileId(nodeId)
             }
         }
 
@@ -100,12 +103,13 @@
                         try{
                             if (data.data.content){
                                 $("#content").val(data.data.content);
+                                $("#content").attr("readonly", true);
                             }else{
                                 $("#content").val("暂无内容");
                             }
                         }catch (e) {
                             $("#content").val("暂无内容");
-                        }
+                            $("#content").attr("readonly", false);                        }
                     }
                 }
             });
@@ -123,14 +127,42 @@
                     }
                 }
             });
+            $("#content").attr("readonly", true);
         }
-        //打开编辑标题对话框
+
+        function editContent(){
+            $.modal.loading("编辑模式");
+            $("#content").attr("readonly", false);
+            setTimeout(function(){
+                $.modal.closeLoading();
+            }, 500)
+        }
+
         function openEditTitle(){
-            $.modal.open("修改", prefix + "/edit/"+$("#titleId").val(), 800, 200, editTitleCallBack);
+            let titleId = $("#titleId").val();
+            if (titleId != '999999999' && titleId != ''){
+                $.modal.open("修改", prefix + "/edit/"+titleId, 800, 200, editTitleCallBack);
+            }
+        }
+
+        function openAddTitle(){
+            let bookKey = $("#bookKey").val();
+            $.modal.open("修改", prefix + "/add?bookKey="+bookKey, 800, 200, addTitleCallBack);
+
+        }
+
+        function addTitleCallBack(index){
+            let retVal = window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
+            if (retVal){
+                setTimeout(function (){
+                    queryTree();
+                }, 800);
+                $.modal.closeAll();
+            }
         }
 
         function editTitleCallBack(index){
-            document.getElementById("layui-layer-iframe"+index).contentWindow.submitHandler();
+            window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
             setTimeout(function (){
                 queryTree();
             }, 800);
