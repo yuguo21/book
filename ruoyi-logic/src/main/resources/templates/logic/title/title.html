@@ -48,6 +48,9 @@
         var bookKey = [[${bookKey}]];
         var prefix = ctx + "logic/title";
         $(function() {
+            //注册快捷键 ALT + S
+            HotKeyHandler.Register(2, "S", saveContent);
+
             let pageHeight = $(document.body).height();
 
             var panehHidden = false;
@@ -167,6 +170,10 @@
                 queryTree();
             }, 800);
             $.modal.closeAll();
+        }
+
+        function saveTmpContent(){
+            //文本保存至本地
         }
     </script>
 </body>

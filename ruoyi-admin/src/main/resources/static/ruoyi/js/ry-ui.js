@@ -3,6 +3,47 @@
  * Copyright (c) 2019 ruoyi
  */
 
+// 快捷键注册
+var HotKeyHandler={
+    currentMainKey:null,
+    currentValueKey:null,
+    Init:function(key1 ,key2 ,func){
+        HotKeyHandler.Register(0,"K",function(){alert("注册成功");});
+    },
+    Register:function(tag ,value ,func){
+        var MainKey="";
+        switch(tag){
+            case 0:
+                MainKey=17; //Ctrl
+                break;
+            case 1:
+                MainKey=16; //Shift
+                break;
+            case 2:
+                MainKey="18"; //Alt
+                break;
+        }
+        document.onkeyup=function(e){
+            HotKeyHandler.currentMainKey=null;
+        }
+
+        document.onkeydown=function(event){
+            //获取键值
+            var keyCode= event.keyCode;
+            var keyValue = String.fromCharCode(event.keyCode);
+
+            if(HotKeyHandler.currentMainKey!=null){
+                if(keyValue==value){
+                    HotKeyHandler.currentMainKey=null;
+                    if(func!=null)func();
+                }
+            }
+            if(keyCode==MainKey)
+                HotKeyHandler.currentMainKey=keyCode;
+        }
+    }
+}
+//TextArea 支持 tab 键
 function initTextAreaTab(textarea, spaceCount = 8){
     var func = function(e){
         if(event.code !== "Tab") return true;
