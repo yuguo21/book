@@ -48,11 +48,9 @@
         var bookKey = [[${bookKey}]];
         var prefix = ctx + "logic/title";
         $(function() {
-            //注册快捷键 ALT + S
-            HotKeyHandler.Register(2, "S", saveContent);
+            hotkeys('alt+[', function (event, handler){editContent();});
 
             let pageHeight = $(document.body).height();
-
             var panehHidden = false;
             if ($(this).width() < 769) {
                 panehHidden = true;
@@ -69,11 +67,22 @@
                 $('#scroll-up').toTop(opt);
             }
             queryTree();
-            initTextAreaTab(document.getElementById('content'), 4);
+            initTextAreaTab(document.getElementById("content"), 4, function(key){
+                if (key === 'KeyS'){
+                    saveContent();
+                }
+                if (key === 'KeyE'){
+                    editContent();
+                }
+                if (key === 'KeyL'){
+                    let contentLength = document.getElementById("content").value;
+                    contentLength = contentLength.replace(" ","");
+                    $.modal.msgSuccess("字："+contentLength.length+"个，不包含空格");
+                }
+            });
             document.querySelector("#btnRefresh").onclick = queryTree;
             document.querySelector("#btnAddTitle").onclick = openAddTitle;
         });
-
         //chapter tree
         function queryTree() {
             var url = prefix + "/tree?bookKey=" + bookKey;
@@ -118,7 +127,7 @@
             });
         }
 
-        function saveContent(){
+        function saveContent(flag){
             let bookContent = $("#bookForm").serialize();
             $.ajax({
                 url: prefix + "/addContent",
@@ -130,12 +139,16 @@
                     }
                 }
             });
-            $("#content").attr("readonly", true);
         }
 
         function editContent(){
             $.modal.loading("编辑模式");
-            $("#content").attr("readonly", false);
+            let readonlyflag = $("#content").attr("readonly");
+            if (readonlyflag){
+                $("#content").attr("readonly", false);
+            }else{
+                $("#content").attr("readonly", true);
+            }
             setTimeout(function(){
                 $.modal.closeLoading();
             }, 500)
