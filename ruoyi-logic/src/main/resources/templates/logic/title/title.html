@@ -30,13 +30,14 @@
                     <li>
                         <a class="btn btn-primary btn-rounded btn-sm" onclick="editContent();"><i class="fa fa-search"></i>&nbsp;编辑</a>
                         <a class="btn btn-warning btn-rounded btn-sm" onclick="saveContent();"><i class="fa fa-refresh"></i>&nbsp;保存</a>
+                        <a class="btn btn-danger btn-rounded btn-sm" onclick="addCard();"><i class="fa fa-credit-card"></i>&nbsp;元素</a>
                     </li>
                 </ul>
             </div>
             <form class="formH100" id="bookForm">
                 <input type="hidden" id="bookKey" name="bookKey" th:value="${bookKey}" />
                 <input type="hidden" id="titleId" name="titleId"/>
-                <textarea readonly="true" style="font-family: 楷体;" class="paperlines" id="content" name="content" placeholder="  最是人间留不住,朱颜辞镜花辞树" ></textarea>
+                <textarea readonly="true" style="font-family: 楷体;" class="paperlines" id="content" name="content" placeholder=" --S 保存 &#10; --E 编辑 &#10; alt+[ 编辑 &#10; --L 字数" ></textarea>
             </form>
         </div>
     </div>
@@ -44,150 +45,7 @@
     <th:block th:include="include :: footer" />
     <th:block th:include="include :: layout-latest-js" />
     <th:block th:include="include :: ztree-js" />
-    <script th:inline="javascript">
-        var bookKey = [[${bookKey}]];
-        var prefix = ctx + "logic/title";
-        $(function() {
-            hotkeys('alt+[', function (event, handler){editContent();});
-
-            let pageHeight = $(document.body).height();
-            var panehHidden = false;
-            if ($(this).width() < 769) {
-                panehHidden = true;
-            }
-
-            $('body').layout({ initClosed: panehHidden, west__size: 185 });
-            // 回到顶部绑定
-
-            if ($.fn.toTop !== undefined) {
-                var opt = {
-                    win:$('.ui-layout-center'),
-                    doc:$('.ui-layout-center')
-                };
-                $('#scroll-up').toTop(opt);
-            }
-            queryTree();
-            initTextAreaTab(document.getElementById("content"), 4, function(key){
-                if (key === 'KeyS'){
-                    saveContent();
-                }
-                if (key === 'KeyE'){
-                    editContent();
-                }
-                if (key === 'KeyL'){
-                    let contentLength = document.getElementById("content").value;
-                    contentLength = contentLength.replace(" ","");
-                    $.modal.msgSuccess("字："+contentLength.length+"个，不包含空格");
-                }
-            });
-            document.querySelector("#btnRefresh").onclick = queryTree;
-            document.querySelector("#btnAddTitle").onclick = openAddTitle;
-        });
-        //chapter tree
-        function queryTree() {
-            var url = prefix + "/tree?bookKey=" + bookKey;
-            var options = {
-                url: url,
-                expandLevel: 2,
-                onClick : zOnClick
-            };
-            $.tree.init(options);
-
-            function zOnClick(event, treeId, treeNode) {
-                let nodeId = treeNode.id;
-                if (nodeId != '99999999'){
-                    $("#titleId").val(nodeId);
-                    getContentByTitileId(nodeId);
-                }else{
-                    $("#titleId").val('');
-                }
-            }
-        }
-
-        function getContentByTitileId(id){
-            //点击章节获取对应的内容
-            $.ajax({
-                url: prefix + "/getContent",
-                method: "get",
-                data: {titleId: id},
-                success: function(data){
-                    if (data.code == 0){
-                        try{
-                            if (data.data.content){
-                                $("#content").val(data.data.content);
-                                $("#content").attr("readonly", true);
-                            }else{
-                                $("#content").val("暂无内容");
-                            }
-                        }catch (e) {
-                            $("#content").val("暂无内容");
-                            $("#content").attr("readonly", false);                        }
-                    }
-                }
-            });
-        }
-
-        function saveContent(flag){
-            let bookContent = $("#bookForm").serialize();
-            $.ajax({
-                url: prefix + "/addContent",
-                method: "post",
-                data: bookContent,
-                success: function(data){
-                    if(data.code == 0){
-                        $.modal.msgSuccess(data.msg);
-                    }
-                }
-            });
-        }
-
-        function editContent(){
-            $.modal.loading("编辑模式");
-            let readonlyflag = $("#content").attr("readonly");
-            if (readonlyflag){
-                $("#content").attr("readonly", false);
-            }else{
-                $("#content").attr("readonly", true);
-            }
-            setTimeout(function(){
-                $.modal.closeLoading();
-            }, 500)
-        }
-
-        function openEditTitle(){
-            let titleId = $("#titleId").val();
-            if (titleId != '999999999' && titleId != ''){
-                $.modal.open("修改", prefix + "/edit/"+titleId, 800, 200, editTitleCallBack);
-            }
-        }
-
-        function openAddTitle(){
-            let bookKey = $("#bookKey").val();
-            $.modal.open("修改", prefix + "/add?bookKey="+bookKey, 800, 200, addTitleCallBack);
-
-        }
-
-        function addTitleCallBack(index){
-            let retVal = window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
-            if (retVal){
-                setTimeout(function (){
-                    queryTree();
-                }, 800);
-                $.modal.closeAll();
-            }
-        }
-
-        function editTitleCallBack(index){
-            window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
-            setTimeout(function (){
-                queryTree();
-            }, 800);
-            $.modal.closeAll();
-        }
-
-        function saveTmpContent(){
-            //文本保存至本地
-        }
-    </script>
+    <script th:inline="javascript">var bookKey = [[${bookKey}]];</script>
+    <script th:src="@{/ruoyi/logic/title.js}"></script>
 </body>
 </html>

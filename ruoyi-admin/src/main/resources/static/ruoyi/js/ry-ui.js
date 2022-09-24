@@ -10,7 +10,6 @@ var cmdFlag = 0;
 const Backspace = new KeyboardEvent('keydown', {bulles: true, cancelable:true, keyCode: 8});
 function initTextAreaTab(textarea, spaceCount = 8, cmdHandle){
     var func = function(event){
-        console.log(event.code);
         if(event.code === "Tab"){
             event.preventDefault();
             let start = this.selectionStart;

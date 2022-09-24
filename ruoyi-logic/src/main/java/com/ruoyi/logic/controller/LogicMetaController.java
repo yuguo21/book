@@ -36,8 +36,10 @@ public class LogicMetaController extends BaseController
 
     @RequiresPermissions("logic:meta:view")
     @GetMapping()
-    public String meta()
+    public String meta(String bookKey, ModelMap mmap)
     {
+        mmap.addAttribute("bookKey", bookKey);
+
         return prefix + "/meta";
     }
 
@@ -72,8 +74,9 @@ public class LogicMetaController extends BaseController
      * 新增书中元素
      */
     @GetMapping("/add")
-    public String add()
+    public String add(String bookKey, ModelMap mmap)
     {
+        mmap.addAttribute("bookKey", bookKey);
         return prefix + "/add";
     }
 
