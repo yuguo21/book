@@ -364,7 +364,11 @@ public class Convert
      */
     public static String[] toStrArray(String str)
     {
-        return toStrArray(",", str);
+        if (str.lastIndexOf(",")>-1){
+            return toStrArray(",", str);
+        }else{
+            return new String[] {str};
+        }
     }
 
     /**

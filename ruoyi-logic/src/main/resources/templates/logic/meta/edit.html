@@ -29,12 +29,10 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">    
+            <div class="form-group hidden">
                 <label class="col-sm-3 control-label">书名：</label>
                 <div class="col-sm-8">
-                    <select name="bookKey" class="form-control m-b" th:with="type=${@dict.getType('book_name')}">
-                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{bookKey}"></option>
-                    </select>
+                    <input type="hidden" name="bookKey" th:field="*{bookKey}">
                 </div>
             </div>
             <div class="form-group">    
@@ -45,7 +43,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group hidden">
                 <label class="col-sm-3 control-label">：</label>
                 <div class="col-sm-8">
                     <textarea name="remark" class="form-control">[[*{remark}]]</textarea>

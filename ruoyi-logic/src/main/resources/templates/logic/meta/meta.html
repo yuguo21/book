@@ -27,7 +27,7 @@
                             </select>
                         </li>
                         <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="searchMeta()"><i
                                     class="fa fa-search"></i>&nbsp;搜索</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
                                     class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -47,38 +47,49 @@
 <th:block th:include="include :: footer"/>
 <script th:src="@{/ruoyi/logic/meta.js}"></script>
 <script th:inline="javascript">
-    var editFlag = [[${@permission.hasPermi('logic:meta:edit')}]];
-    var removeFlag = [[${@permission.hasPermi('logic:meta:remove')}]];
-    var bookKeyDatas = [[${@dict.getType('book_name')}]];
-    var stateDatas = [[${@dict.getType('book_meta')}]];
-    var bookKey = [[${bookKey}]];
+    let editFlag = [[${@permission.hasPermi('logic:meta:edit')}]];
+    let removeFlag = [[${@permission.hasPermi('logic:meta:remove')}]];
+
+    let bookKey = [[${bookKey}]];
 
     var prefix = ctx + "logic/meta";
 
     $(function () {
         queryMeta();
     });
-    let pageNum = 1;
-    let pageSize = 24;
-    let ajaxFlag = true;
+
+    let pageNum = 1,pageSize = 24,ajaxFlag = true;
+
+    function initQueryParm(){
+        pageNum = 1;pageSize = 24;ajaxFlag = true;
+        $(".metaCol").remove();
+    }
+
+    function searchMeta(){
+        initQueryParm();
+        queryMeta();
+    }
+
     function queryMeta(){
         if (!ajaxFlag){
             return;
         }
         let metaName = $("input[name='name']").val();
+        let metaState = $("select[name='state']").val();
         $.ajax({
             url: prefix + "/list",
             method: "post",
             beforeSend: function(){
+                ajaxFlag = false;
                 $.modal.loading();
             },
-            data: {bookKey: bookKey, metaName: metaName, pageNum: pageNum, pageSize: pageSize, orderByColumn: "metaId", isAsc: "asc"},
+            data: {bookKey: bookKey, name: metaName, state: metaState, pageNum: pageNum, pageSize: pageSize, orderByColumn: "updateTime", isAsc: "desc"},
             success: function (data){
-                let model = "<div class=\"col-sm-3\"><div class=\"thumbnail\"><img src=\"{0}\">"
+                let model = "<div class=\"col-sm-3 metaCol\"><div class=\"thumbnail\"><img src=\"{0}\">"
                  +"<div class=\"caption\">"
                  +"<h3>{1}</h3>"
                  +"<div class=\"text-right\" style=\"padding-bottom: 10px;\">"
-                 +"<a href=\"#plus\" style=\"padding-right: 10px;\" onclick=\"addRelation({3})\" title=\"添加关系\"><i class=\"fa fa-plus\"></i></a>"
+                 +"<a href=\"#plus\" style=\"padding-right: 10px;\" onclick=\"addRelation({3},'{1}')\" title=\"添加关系\"><i class=\"fa fa-plus\"></i></a>"
                  +"<a href=\"#times\" style=\"padding-right: 10px;\" onclick=\"removeMeta({3})\" title=\"删除元素\"><i class=\"fa fa-times\"></i></a>"
                  +"<a href=\"#pencil-square-o\" style=\"padding-right: 10px;\" onclick=\"editMeta({3})\" title=\"编辑元素\"><i class=\"fa fa-edit\"></i></a>"
                  +"</div>"
@@ -90,6 +101,7 @@
 
                 if (meta.length === pageSize){
                     pageNum++;
+                    ajaxFlag = true;
                 }else{
                     ajaxFlag = false;
                 }
@@ -105,28 +117,46 @@
         });
     }
 
-    function addRelation(metaId){
-        $.modal.openTab("添加关系", ctx + "?metaId=" + metaId);
+    function addRelation(metaId, name){
+        $.modal.openTab(name+"::属性", ctx + "logic/relation?metaId=" + metaId);
     }
 
     function removeMeta(metaId){
-        $.modal.confirm("确定删除元素？", function (ent){
-
+        $.modal.confirm("确定删除元素？", function (evt){
+            $.ajax({
+                url: prefix + "/remove",
+                method: "post",
+                data: {ids: metaId},
+                success: function(data){
+                    initQueryParm();
+                    queryMeta();
+                }
+            });
         });
     }
 
-    function editMeta(){
-
+    function editMeta(metaId){
+        $.modal.open("修改元素", prefix+"/edit/"+metaId, 800, 600, editCallBack);
     }
 
     function addMeta(){
         $.modal.open("添加元素", prefix+"/add?bookKey="+bookKey, 800, 600, addCallBack);
     }
 
+    function editCallBack(index){
+        window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
+        setTimeout(function (){
+            initQueryParm();
+            queryMeta();
+        }, 800);
+        $.modal.closeAll();
+    }
+
     function addCallBack(index){
         window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
         setTimeout(function (){
-            //刷新页面， 或者重新重新查找
+            initQueryParm();
+            queryMeta();
         }, 800);
         $.modal.closeAll();
     }

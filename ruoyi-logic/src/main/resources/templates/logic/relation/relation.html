@@ -8,22 +8,16 @@
         <div class="row">
             <div class="col-sm-12 search-collapse">
                 <form id="formId">
+                    <input type="hidden" name="metaId">
                     <div class="select-list">
                         <ul>
                             <li>
-                                <label>书名：</label>
-                                <select name="bookKey" th:with="type=${@dict.getType('book_name')}">
-                                    <option value="">所有</option>
-                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
-                                </select>
-                            </li>
-                            <li>
-                                <label>人物：</label>
+                                <label>名称：</label>
                                 <input type="text" name="personIdA_"/>
                                 <input type="hidden" name="personIds"/>
                             </li>
                             <li>
-                                <label>关系名称：</label>
+                                <label>关系：</label>
                                 <input type="text" name="relationName"/>
                             </li>
                             <li>

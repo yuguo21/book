@@ -46,7 +46,13 @@ public class LogicBookTitleController extends BaseController
     @RequiresPermissions("logic:title:view")
     @GetMapping()
     public String title(String bookKey, ModelMap mmap) {
-        mmap.addAttribute("bookKey", bookKey);
+        List<SysDictData> dicts = DictUtils.getDictCache("go_book_name");
+        for (SysDictData dictData : dicts){
+            if (dictData.getDictValue().equals(bookKey)){
+                mmap.addAttribute("bookKey", dictData.getDictValue());
+                mmap.addAttribute("bookName", dictData.getDictLabel());
+            }
+        }
         return prefix + "/title";
     }
 
