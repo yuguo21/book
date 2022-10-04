@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('人物关系列表')" />
+</head>
+<body class="gray-bg">
+
+<th:block th:include="include :: footer" />
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('logic:relation:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('logic:relation:remove')}]];
+    var prefix = ctx + "logic/relation";
+
+
+
+
+
+
+
+</script>
+<script th:src="@{/ruoyi/logic/logicPerson.js}"></script>
+</body>
+</html>
