@@ -19,6 +19,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="nameB" column="name_b"/>
     </resultMap>
 
+    <resultMap type="LogicPersonRelationVo" id="LogicPersonRelationVoResult">
+        <result property="relationId"    column="relation_id"    />
+        <result property="bookKey"    column="book_key"    />
+        <result property="personIdA"    column="person_id_a"    />
+        <result property="personIdB"    column="person_id_b"    />
+        <result property="relationName"    column="relation_name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="nameA" column="name_a"/>
+        <result property="nameB" column="name_b"/>
+        <result property="name" column="name" />
+        <result property="photo" column="photo" />
+        <result property="state" column="state" />
+    </resultMap>
+
     <sql id = "selectPersonName">
         ,(select name from logic_meta where meta_id = person_id_b) as name_b,
         (select name from logic_meta where meta_id = person_id_a) as name_a
@@ -44,6 +62,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <!-- <if test="personIds != null and personIds !=''">and person_id_a in (${personIds})</if> -->
         </where>
+    </select>
+
+    <select id="selectAllList" parameterType="LogicPersonRelationDTO" resultMap="LogicPersonRelationVoResult">
+        SELECT lpr.*,lm.name,lm.photo,lm.state FROM ry.logic_person_relation as lpr left join ry.logic_meta as lm on lpr.person_id_b = lm.meta_id
+        <where>
+            <if test="bookKey != null  and bookKey != ''"> and lpr.book_key = #{bookKey}</if>
+            <if test="personIdA != null "> and lpr.person_id_a = #{personIdA}</if>
+            <if test="personIdB != null "> and lpr.person_id_b = #{personIdB}</if>
+            <if test="relationName != null  and relationName != ''"> and lpr.relation_name = #{relationName}</if>
+            <if test="personIds != null and personIds.length>0">and lpr.person_id_a in
+                <foreach collection="personIds" item="personId" index="index" open="(" close=")" separator=",">
+                    #{personId}
+                </foreach>
+            </if>
+        </where>
+        order by update_time desc
     </select>
     
     <select id="selectLogicPersonRelationByRelationId" parameterType="Long" resultMap="LogicPersonRelationResult">

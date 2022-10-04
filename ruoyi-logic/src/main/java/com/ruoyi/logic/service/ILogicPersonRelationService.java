@@ -2,6 +2,7 @@ package com.ruoyi.logic.service;
 
 import java.util.List;
 import com.ruoyi.logic.domain.LogicPersonRelation;
+import com.ruoyi.logic.domain.LogicPersonRelationVo;
 import com.ruoyi.logic.dto.LogicPersonRelationDTO;
 
 /**
@@ -27,6 +28,8 @@ public interface ILogicPersonRelationService
      * @return 人物关系集合
      */
     public List<LogicPersonRelation> selectLogicPersonRelationList(LogicPersonRelationDTO logicPersonRelation);
+
+    public List<LogicPersonRelationVo> queryAllList(LogicPersonRelationDTO logicPersonRelation);
 
     /**
      * 新增人物关系

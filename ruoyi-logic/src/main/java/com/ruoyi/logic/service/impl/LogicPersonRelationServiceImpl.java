@@ -2,6 +2,7 @@ package com.ruoyi.logic.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.logic.domain.LogicPersonRelationVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.logic.mapper.LogicPersonRelationMapper;
@@ -45,6 +46,12 @@ public class LogicPersonRelationServiceImpl implements ILogicPersonRelationServi
     {
         return logicPersonRelationMapper.selectLogicPersonRelationList(logicPersonRelation);
     }
+
+    @Override
+    public List<LogicPersonRelationVo> queryAllList(LogicPersonRelationDTO logicPersonRelation) {
+        return logicPersonRelationMapper.selectAllList(logicPersonRelation);
+    }
+
 
     /**
      * 新增人物关系

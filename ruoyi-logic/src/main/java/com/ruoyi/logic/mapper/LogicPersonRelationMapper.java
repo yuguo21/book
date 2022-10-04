@@ -2,6 +2,7 @@ package com.ruoyi.logic.mapper;
 
 import java.util.List;
 import com.ruoyi.logic.domain.LogicPersonRelation;
+import com.ruoyi.logic.domain.LogicPersonRelationVo;
 import com.ruoyi.logic.dto.LogicPersonRelationDTO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,6 +22,8 @@ public interface LogicPersonRelationMapper
      * @return 人物关系
      */
     public LogicPersonRelation selectLogicPersonRelationByRelationId(Long relationId);
+
+    public List<LogicPersonRelationVo> selectAllList(LogicPersonRelationDTO logicPersonRelation);
 
     /**
      * 查询人物关系列表

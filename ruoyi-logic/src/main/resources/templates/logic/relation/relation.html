@@ -2,139 +2,188 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <th:block th:include="include :: header('人物关系列表')" />
+    <th:block th:include="include :: layout-latest-css" />
+    <th:block th:include="include :: ztree-css" />
 </head>
 <body class="gray-bg">
-     <div class="container-div">
-        <div class="row">
-            <div class="col-sm-12 search-collapse">
-                <form id="formId">
-                    <input type="hidden" name="metaId">
-                    <div class="select-list">
-                        <ul>
-                            <li>
-                                <label>名称：</label>
-                                <input type="text" name="personIdA_"/>
-                                <input type="hidden" name="personIds"/>
-                            </li>
-                            <li>
-                                <label>关系：</label>
-                                <input type="text" name="relationName"/>
-                            </li>
-                            <li>
-                                <a class="btn btn-primary btn-rounded btn-sm" onclick="searchBefore()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-                            </li>
-                        </ul>
-                    </div>
-                </form>
+    <div class="ui-layout-west">
+        <div class="box box-main">
+            <div class="box-header">
+                <div class="box-title">
+                    <i class="fa icon-grid"></i>
+                    元素树
+                </div>
+                <div class="box-tools pull-right input-group-sm">
+                    <input class="form-control" id="keyword" type="text" placeholder="请输入...">
+                </div>
             </div>
-
-            <div class="btn-group-sm" id="toolbar" role="group">
-                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="logic:relation:add">
-                    <i class="fa fa-plus"></i> 添加
-                </a>
-                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="logic:relation:edit">
-                    <i class="fa fa-edit"></i> 修改
-                </a>
-                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="logic:relation:remove">
-                    <i class="fa fa-remove"></i> 删除
-                </a>
-                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="logic:relation:export">
-                    <i class="fa fa-download"></i> 导出
-                </a>
-            </div>
-            <div class="col-sm-12 select-table table-striped">
-                <table id="bootstrap-table"></table>
+            <div class="ui-layout-content">
+                <div id="tree" class="ztree"></div>
             </div>
         </div>
     </div>
+    <div class="ui-layout-center">
+        <div class="container-div">
+            <div class="row" id="relationContent"></div>
+        </div>
+    </div>
     <th:block th:include="include :: footer" />
+    <th:block th:include="include :: layout-latest-js" />
+    <th:block th:include="include :: ztree-js" />
+
     <script th:inline="javascript">
-        var editFlag = [[${@permission.hasPermi('logic:relation:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('logic:relation:remove')}]];
-        var bookKeyDatas = [[${@dict.getType('book_name')}]];
-        var prefix = ctx + "logic/relation";
+        let editFlag = [[${@permission.hasPermi('logic:relation:edit')}]];
+        let removeFlag = [[${@permission.hasPermi('logic:relation:remove')}]];
+        let prefix = ctx + "logic/relation";
+        let bookKey = [[${bookKey}]];
+        let metaName = [[${name}]];
+        let metaId = [[${metaId}]];
 
         $(function() {
-            var options = {
-                url: prefix + "/list",
-                createUrl: prefix + "/add",
-                updateUrl: prefix + "/edit/{id}",
-                removeUrl: prefix + "/remove",
-                exportUrl: prefix + "/export",
-                modalName: "人物关系",
-                columns: [{
-                    checkbox: true
-                },
-                {
-                    field: 'relationId',
-                    title: '',
-                    visible: false
-                },
-                {
-                    field: 'bookKey',
-                    title: '书名',
-                    formatter: function(value, row, index) {
-                       return $.table.selectDictLabel(bookKeyDatas, value);
-                    }
-                },
-                {
-                    field: 'nameA',
-                    title: '人物'
-                },
-                {
-                    field: 'nameB',
-                    title: '人物2'
-                },
-                {
-                    field: 'relationName',
-                    title: '关系名称'
-                },
-                {
-                    field: 'remark',
-                    title: '备注'
-                },
-                {
-                    title: '操作',
-                    align: 'center',
-                    formatter: function(value, row, index) {
-                        var actions = [];
-                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.relationId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.relationId + '\')"><i class="fa fa-remove"></i>删除</a>');
-                        return actions.join('');
-                    }
-                }]
-            };
-            $.table.init(options);
+            let panehHidden = false;
+            if ($(this).width() < 769) {
+                panehHidden = true;
+            }
+
+            $('body').layout({ initClosed: panehHidden, west__size: 185 });
+            // 回到顶部绑定
+
+            if ($.fn.toTop !== undefined) {
+                var opt = {
+                    win:$('.ui-layout-center'),
+                    doc:$('.ui-layout-center')
+                };
+                $('#scroll-up').toTop(opt);
+            }
+
+            queryTree();
+            queryRelation();
         });
-        
-        function setPersonId(list, parm){
-            if (list.length>0){
-                let personId = '';
-                for (let i=0;i<list.length;i++){
-                    personId += list[i].metaId+",";
+
+        function initRelationContent(){
+            $(".relationCol").remove();
+            setTimeout(function (){
+                queryRelation();
+            }, 800);
+        }
+
+        function queryRelation(){
+            $.ajax({
+                url: prefix + "/listAll",
+                method: "post",
+                data: {bookKey: bookKey, personIdA: metaId},
+                beforeSend: function(){
+                    $.modal.loading();
+                },
+                success: function(data){
+                    for (let i=0; i<data.length; i++){
+                        let photo = data[i].photo===""?ctx + "img/qtk.jpg":data[i].photo;
+                        let model = "<div class=\"col-sm-3 relationCol\"><div class=\"thumbnail\"><img src=\""+photo+"\">"
+                            +"<div class=\"caption\">"
+                            +"<h3>"+data[i].name+"</h3>"
+                            +"<div class=\"text-right\" style=\"padding-bottom: 10px;\">"
+                            +"<a>"+data[i].relationName+"</a>&nbsp;&nbsp;&nbsp;"
+                            +"<a href=\"#times\" style=\"padding-right: 10px;\" onclick=\"removeRelation("+data[i].relationId+")\" title=\"删除元素\"><i class=\"fa fa-times\"></i></a>"
+                            +"<a href=\"#pencil-square-o\" style=\"padding-right: 10px;\" onclick=\"editRelation("+data[i].relationId+")\" title=\"编辑元素\"><i class=\"fa fa-edit\"></i></a>"
+                            +"</div>"
+                            +"<div style=\"height: 100px;max-height: 100px;\">"
+                            +"<p>"+data[i].remark+"</p>"
+                            +"</div></div></div></div>";
+                        $("#relationContent").append(model);
+                    }
+                    $.modal.closeLoading();
                 }
-                personId = personId.substring(0, personId.length-1);
-                $("input[name='"+parm+"']").val(personId);
-                $.table.search();
-            }else{
-                alert("该人物未收录");
-            }
-            
+            })
         }
 
-        function searchBefore(){
-            let name = $("input[name='personIdA_']").val();
-            if (name == ''){
-                $("input[name='personIds']").val('');
-                $.table.search();
-            }else{
-                searchByName(name,setPersonId,"personIds");
+        function queryTree() {
+            let url = prefix + "/tree?bookKey=" + bookKey;
+            let options = {
+                url: url,
+                expandLevel: 2,
+                onClick : zOnClick
+            };
+            $.tree.init(options);
+
+            function zOnClick(event, treeId, treeNode) {
+                let nodeId = treeNode.id;
+                if (nodeId > '90000000'){
+
+                }else{
+                    addRelation(treeNode);
+                }
             }
         }
 
+        let hiddenNodes=[]; //用于存储被隐藏的结点
 
+        //过滤ztree显示数据
+        function filter(obj) {
+            //显示上次搜索后背隐藏的结点
+            zTreeObj.showNodes(hiddenNodes);
+
+            //查找不符合条件的叶子节点
+            function filterFunc(node) {
+                let _keywords = $(obj).val();
+                if (node.isParent || node.name.indexOf(_keywords) != -1) return false;
+                return true;
+            };
+
+            //获取不符合条件的叶子结点
+            hiddenNodes = zTreeObj.getNodesByFilter(filterFunc);
+
+            //隐藏不符合条件的叶子结点
+            zTreeObj.hideNodes(hiddenNodes);
+        }
+
+
+
+        let currentTreeNodeId = 0;
+
+        function addRelation(treeNode){
+            let nodeId = treeNode.id;
+            if (currentTreeNodeId === nodeId){
+                currentTreeNodeId = 0;
+                $.modal.open(metaName+"::"+treeNode.name, prefix + "/add?bookKey="+bookKey+"&personIdA="+metaId+"&personIdB="+nodeId, 800, 400, addRelationCallBack);
+            }else{
+                currentTreeNodeId = nodeId;
+            }
+        }
+
+        function addRelationCallBack(index){
+            window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
+            setTimeout(function (){
+                initRelationContent();
+            }, 800);
+            $.modal.closeAll();
+        }
+
+        function removeRelation(relationId){
+            $.modal.confirm("确定删除关系？",function (evt){
+                $.ajax({
+                    url: prefix + "/remove",
+                    method: "post",
+                    data: {ids: relationId},
+                    beforeSend: function(){
+                        $.modal.loading();
+                    },
+                    success : function(data){
+                        initRelationContent();
+                        $.modal.closeLoading();
+                    }
+                });
+            })
+        }
+
+        function editRelation(relationId){
+            $.modal.open("",prefix+"/edit/"+relationId,800,400, editRelationCallBack);
+        }
+
+        function editRelationCallBack(index){
+            window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
+            initRelationContent();
+            $.modal.closeAll();
+        }
     </script>
-    <script th:src="@{/ruoyi/logic/logicPerson.js}"></script>
 </body>
 </html>
