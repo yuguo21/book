@@ -60,4 +60,11 @@ public interface LogicMetaMapper
      * @return 结果
      */
     public int deleteLogicMetaByMetaIds(String[] metaIds);
+
+    /**
+     * 查询最大序列
+     * @param state 分类
+     * @return
+     */
+    public Long queryMaxSeq(String state);
 }

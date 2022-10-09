@@ -58,4 +58,7 @@ public interface ILogicMetaService
      * @return 结果
      */
     public int deleteLogicMetaByMetaId(Long metaId);
+
+
+    public Long queryMaxSeq(String state);
 }

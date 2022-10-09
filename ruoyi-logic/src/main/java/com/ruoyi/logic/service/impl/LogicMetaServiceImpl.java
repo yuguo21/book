@@ -96,4 +96,9 @@ public class LogicMetaServiceImpl implements ILogicMetaService
     {
         return logicMetaMapper.deleteLogicMetaByMetaId(metaId);
     }
+
+    @Override
+    public Long queryMaxSeq(String state){
+        return logicMetaMapper.queryMaxSeq(state);
+    }
 }

@@ -20,8 +20,7 @@
                         </li>
                         <li>
                             <label>类型：</label>
-                            <select name="state" th:with="type=${@dict.getType('book_meta')}">
-                                <option value="">所有</option>
+                            <select name="state" th:with="type=${@dict.getType('book_meta')}" onchange="searchMeta();">
                                 <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
                                         th:value="${dict.dictValue}"></option>
                             </select>
@@ -83,18 +82,19 @@
                 ajaxFlag = false;
                 $.modal.loading();
             },
-            data: {bookKey: bookKey, name: metaName, state: metaState, pageNum: pageNum, pageSize: pageSize, orderByColumn: "updateTime", isAsc: "desc"},
+            data: {bookKey: bookKey, name: metaName, state: metaState, pageNum: pageNum, pageSize: pageSize, orderByColumn: "seq", isAsc: "asc"},
             success: function (data){
-                let model = "<div class=\"col-sm-3 metaCol\"><div class=\"thumbnail\"><img src=\"{0}\">"
+                let model = "<div class=\"col-sm-3 metaCol\"><div class=\"thumbnail\"><img style=\"height:140px !important;\" src=\"{0}\">"
                  +"<div class=\"caption\">"
                  +"<h3>{1}</h3>"
                  +"<div class=\"text-right\" style=\"padding-bottom: 10px;\">"
                  +"<a href=\"#plus\" style=\"padding-right: 10px;\" onclick=\"addRelation({3},'{1}')\" title=\"添加关系\"><i class=\"fa fa-plus\"></i></a>"
                  +"<a href=\"#times\" style=\"padding-right: 10px;\" onclick=\"removeMeta({3})\" title=\"删除元素\"><i class=\"fa fa-times\"></i></a>"
                  +"<a href=\"#pencil-square-o\" style=\"padding-right: 10px;\" onclick=\"editMeta({3})\" title=\"编辑元素\"><i class=\"fa fa-edit\"></i></a>"
+                 +"<a href=\"#pencil-square-o\" style=\"padding-right: 10px;\" onclick=\"seeMeta({3})\" title=\"查看\"><i class=\"fa fa-eye\"></i></a>"
                  +"</div>"
-                 +"<div style=\"height: 100px;max-height: 100px;\">"
-                 +"<p>{2}</p>"
+                 +"<div style=\"height: 100px;max-height: 100px;overflow: hidden;\">"
+                 +"<p title=\"{2}\">{2}</p>"
                  +"</div></div></div></div>";
 
                 let meta = data.rows;
@@ -137,6 +137,10 @@
 
     function editMeta(metaId){
         $.modal.open("修改元素", prefix+"/edit/"+metaId, 800, 600, editCallBack);
+    }
+
+    function seeMeta(metaId){
+        $.modal.open("查看详细", prefix+"/see/"+metaId, 800, 600, editCallBack);
     }
 
     function addMeta(){

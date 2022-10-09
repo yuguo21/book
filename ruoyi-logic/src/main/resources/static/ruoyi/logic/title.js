@@ -24,14 +24,14 @@ $(function() {
     initTextAreaTab(document.getElementById("content"), 4, function(key){
         if (key === 'KeyS'){
             saveContent();
-        }
-        if (key === 'KeyE'){
+        }else if (key === 'KeyE'){
             editContent();
-        }
-        if (key === 'KeyL'){
+        }else if (key === 'KeyL'){
             let contentLength = document.getElementById("content").value;
             contentLength = contentLength.replace(" ","");
-            $.modal.msgSuccess("字："+contentLength.length+"个，不包含空格");
+            $.modal.msgSuccess("字："+contentLength.length+"个");
+        }else if (key === 'KeyM'){
+            addCard();
         }
     });
     document.querySelector("#btnRefresh").onclick = queryTree;
@@ -145,4 +145,18 @@ function saveTmpContent(){
 
 function addCard(){
     $.modal.openTab(bookName + "::元素", ctx + "logic/meta?bookKey="+bookKey);
+}
+
+
+/**
+ * 这个要不要呢？
+ */
+function openMetaWindow(){
+    $.modal.open("添加元素", ctx + "logic/meta/add?bookKey="+bookKey, 800, 600, addCallBack);
+}
+
+function addCallBack(index){
+    window.parent.document.querySelector("#layui-layer-iframe"+index).contentWindow.submitHandler();
+    $.modal.alertSuccess("添加成功");
+    $.modal.closeAll();
 }

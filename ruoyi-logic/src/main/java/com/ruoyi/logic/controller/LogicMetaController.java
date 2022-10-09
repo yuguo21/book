@@ -1,6 +1,9 @@
 package com.ruoyi.logic.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -70,6 +73,16 @@ public class LogicMetaController extends BaseController
         return util.exportExcel(list, "书中元素数据");
     }
 
+    @RequiresPermissions("logic:meta:export")
+    @GetMapping("/querySeq")
+    @ResponseBody
+    public AjaxResult querySeq(String state){
+        Long maxSeq = logicMetaService.queryMaxSeq(state);
+        Map<String, Long> rstMap = new HashMap<>();
+        rstMap.put("seq", maxSeq);
+        return AjaxResult.success(rstMap);
+    }
+
     /**
      * 新增书中元素
      */
@@ -102,6 +115,18 @@ public class LogicMetaController extends BaseController
         LogicMeta logicMeta = logicMetaService.selectLogicMetaByMetaId(metaId);
         mmap.put("logicMeta", logicMeta);
         return prefix + "/edit";
+    }
+
+    /**
+     * 修改书中元素
+     */
+    @RequiresPermissions("logic:meta:edit")
+    @GetMapping("/see/{metaId}")
+    public String see(@PathVariable("metaId") Long metaId, ModelMap mmap)
+    {
+        LogicMeta logicMeta = logicMetaService.selectLogicMetaByMetaId(metaId);
+        mmap.put("logicMeta", logicMeta);
+        return prefix + "/see";
     }
 
     /**

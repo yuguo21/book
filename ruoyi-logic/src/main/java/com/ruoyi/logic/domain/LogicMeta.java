@@ -36,7 +36,9 @@ public class LogicMeta extends BaseEntity
     @Excel(name = "类型")
     private String state;
 
-
+    /** 排序 */
+    @Excel(name = "排序")
+    private Integer seq;
 
     
 
@@ -95,6 +97,14 @@ public class LogicMeta extends BaseEntity
         return state;
     }
 
+    public void setSeq(Integer seq){
+        this.seq  = seq;
+    }
+
+    public Integer getSeq(){
+        return this.seq;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -109,6 +119,7 @@ public class LogicMeta extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
+            .append("seq", getSeq())
             .toString();
     }
 }

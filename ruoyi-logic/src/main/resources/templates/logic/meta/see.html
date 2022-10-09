@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改元素传记')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-meta-edit" th:object="${logicMeta}">
+            <input name="metaId" th:field="*{metaId}" type="hidden">
+            <div class="form-group">
+                <textarea placeholder="传记：" style="font-family: 楷体;width: 100%; height: 600px;" name="remark" class="form-control paperlines" maxlength="2048">[[*{remark}]]</textarea>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "logic/meta";
+        function submitHandler() {
+            $.operate.save(prefix + "/edit", $('#form-meta-edit').serialize());
+        }
+
+        $(function(){
+            initTextAreaTab(document.getElementsByName("remark")[0], 4, function(key){});
+        })
+    </script>
+</body>
+</html>

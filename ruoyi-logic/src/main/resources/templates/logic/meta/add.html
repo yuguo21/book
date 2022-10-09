@@ -14,9 +14,23 @@
                 </div>
             </div>
             <div class="form-group">
+                <label class="col-sm-3 control-label">类型：</label>
+                <div class="col-sm-8">
+                    <select name="state" class="form-control m-b" th:with="type=${@dict.getType('book_meta')}" onchange="querySeq();">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">排序：</label>
+                <div class="col-sm-8">
+                    <input name="seq" class="form-control" type="number">
+                </div>
+            </div>
+            <div class="form-group">
                 <label class="col-sm-3 control-label">简介：</label>
                 <div class="col-sm-8">
-                    <textarea name="profile" class="form-control"></textarea>
+                    <textarea name="profile" class="form-control" maxlength="256"></textarea>
                 </div>
             </div>
             <div class="form-group">    
@@ -34,18 +48,10 @@
                     <input type="hidden" name="bookKey" th:value="${bookKey}">
                 </div>
             </div>
-            <div class="form-group">    
-                <label class="col-sm-3 control-label">类型：</label>
-                <div class="col-sm-8">
-                    <select name="state" class="form-control m-b" th:with="type=${@dict.getType('book_meta')}">
-                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
-                    </select>
-                </div>
-            </div>
             <div class="form-group hidden">
                 <label class="col-sm-3 control-label">：</label>
                 <div class="col-sm-8">
-                    <textarea name="remark" class="form-control"></textarea>
+                    <textarea name="remark" class="form-control" maxlength="256"></textarea>
                 </div>
             </div>
         </form>
@@ -54,6 +60,23 @@
     <th:block th:include="include :: bootstrap-fileinput-js"/>
     <script th:inline="javascript">
         var prefix = ctx + "logic/meta"
+
+        $(function (){
+            querySeq();
+        });
+
+        function querySeq(){
+            let metaState = $("select[name='state']").val();
+            $.ajax({
+                url: prefix + "/querySeq",
+                method:"get",
+                data:{state: metaState},
+                success: function(data){
+                    $("input[name='seq']").val(data.data.seq);
+                }
+            });
+        }
+
         $("#form-meta-add").validate({
             focusCleanup: true
         });

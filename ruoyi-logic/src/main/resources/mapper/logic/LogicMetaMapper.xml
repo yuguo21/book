@@ -16,10 +16,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="remark"    column="remark"    />
+        <result property="seq"    column="seq"    />
     </resultMap>
 
     <sql id="selectLogicMetaVo">
-        select meta_id, name, profile, photo, book_key, state, create_by, create_time, update_by, update_time, remark from logic_meta
+        select meta_id, name, profile, photo, book_key, state, create_by, create_time, update_by, update_time, remark, seq from logic_meta
     </sql>
 
     <select id="selectLogicMetaList" parameterType="LogicMeta" resultMap="LogicMetaResult">
@@ -35,6 +36,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectLogicMetaVo"/>
         where meta_id = #{metaId}
     </select>
+
+    <select id="queryMaxSeq" parameterType="String" resultType="Long">
+        select max(seq) from logic_meta
+        where state = #{state}
+    </select>
         
     <insert id="insertLogicMeta" parameterType="LogicMeta" useGeneratedKeys="true" keyProperty="metaId">
         insert into logic_meta
@@ -49,6 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
+            <if test="seq != null">seq,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null">#{name},</if>
@@ -61,6 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
+            <if test="seq != null">#{seq},</if>
          </trim>
     </insert>
 
@@ -77,6 +85,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="remark != null">remark = #{remark},</if>
+            <if test="seq != null">seq = #{seq},</if>
         </trim>
         where meta_id = #{metaId}
     </update>
